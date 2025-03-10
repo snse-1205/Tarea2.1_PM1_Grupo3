@@ -14,6 +14,8 @@
 
         public static final String DROP_TABLE_VIDEO ="DROP TABLE IF EXISTS "+TABLE_NAME;
 
+        public static final String SELECT_TABLE_VIDEO ="SELECT * FROM "+TABLE_NAME;
+
     }
 
 

@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 import android.widget.VideoView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     private VideoView videoView;
     private Button guardar, grabar;
-    private Uri videoUri;
+    private static Uri videoUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +61,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (videoUri != null) {
-                    mostrarOpcionesDeGuardado(videoUri);
+                    VideoRepository videoRepository = new VideoRepository(MainActivity.this);
+                    videoRepository.AddVideo("Mi Video", videoUri);
                 }
             }
         });
@@ -84,39 +86,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void guardarVideoEnAlmacenamiento(Uri uri) {
-        try {
-            ContentResolver resolver = getContentResolver();
-            ContentValues values = new ContentValues();
-
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-            String fileName = "VIDEO_" + timeStamp + ".mp4";
-
-            values.put(MediaStore.Video.Media.DISPLAY_NAME, fileName);
-            values.put(MediaStore.Video.Media.MIME_TYPE, "video/mp4");
-            values.put(MediaStore.Video.Media.RELATIVE_PATH, Environment.DIRECTORY_MOVIES);
-
-            Uri videoUriSaved = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
-
-            if (videoUriSaved != null) {
-                InputStream inputStream = resolver.openInputStream(uri);
-                OutputStream outputStream = resolver.openOutputStream(videoUriSaved);
-
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
-
-                inputStream.close();
-                outputStream.close();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private boolean checkPermissions() {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
@@ -129,34 +98,6 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         }, REQUEST_PERMISSIONS);
-    }
-
-    private void mostrarOpcionesDeGuardado(final Uri videoUri) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Guardar video")
-                .setMessage("Donde desea guardar el video?")
-                .setPositiveButton("En SQLite", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        VideoRepository videoRepository = new VideoRepository(MainActivity.this);
-                        videoRepository.AddVideo("Mi Video", videoUri);
-                    }
-                })
-                .setNegativeButton("Almacenamiento", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        guardarVideoEnAlmacenamiento(videoUri);
-                    }
-                })
-                .setNeutralButton("Ambos", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        VideoRepository videoRepository = new VideoRepository(MainActivity.this);
-                        videoRepository.AddVideo("Mi Video", videoUri);
-                        guardarVideoEnAlmacenamiento(videoUri);
-                    }
-                })
-                .show();
     }
 
 }
