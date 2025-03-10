@@ -1,8 +1,10 @@
 package com.example.tarea2_1_pm1;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -16,6 +18,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.example.tarea2_1_pm1.repository.VideoRepository;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
@@ -55,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (videoUri != null) {
-                    guardarVideoEnAlmacenamiento(videoUri);
+                    mostrarOpcionesDeGuardado(videoUri);
                 }
             }
         });
@@ -125,4 +130,33 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         }, REQUEST_PERMISSIONS);
     }
+
+    private void mostrarOpcionesDeGuardado(final Uri videoUri) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Guardar video")
+                .setMessage("Donde desea guardar el video?")
+                .setPositiveButton("En SQLite", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        VideoRepository videoRepository = new VideoRepository(MainActivity.this);
+                        videoRepository.AddVideo("Mi Video", videoUri);
+                    }
+                })
+                .setNegativeButton("Almacenamiento", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        guardarVideoEnAlmacenamiento(videoUri);
+                    }
+                })
+                .setNeutralButton("Ambos", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        VideoRepository videoRepository = new VideoRepository(MainActivity.this);
+                        videoRepository.AddVideo("Mi Video", videoUri);
+                        guardarVideoEnAlmacenamiento(videoUri);
+                    }
+                })
+                .show();
+    }
+
 }
