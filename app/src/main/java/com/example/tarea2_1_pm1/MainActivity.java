@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_PERMISSIONS = 100;
 
     private VideoView videoView;
-    private Button guardar, grabar;
+    private Button guardar, grabar, mostrar;
     private static Uri videoUri;
 
     @Override
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         videoView = findViewById(R.id.videoView);
         guardar = findViewById(R.id.button2);
         grabar = findViewById(R.id.button);
+        mostrar = findViewById(R.id.button3);
 
         if (!checkPermissions()) {
             requestPermissions();
@@ -63,6 +65,29 @@ public class MainActivity extends AppCompatActivity {
                 if (videoUri != null) {
                     VideoRepository videoRepository = new VideoRepository(MainActivity.this);
                     videoRepository.AddVideo("Mi Video", videoUri);
+                }
+            }
+        });
+
+        mostrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    VideoRepository videoRepository = new VideoRepository(MainActivity.this);
+                    Uri videoUri = videoRepository.getLastSavedVideoUri();
+
+                    if (videoUri != null) {
+                        Log.d("VideoUri", "Video URI obtenido: " + videoUri.toString());
+                        videoView.setVideoURI(videoUri);
+                        videoView.start();
+                    } else {
+                        Log.e("VideoUri", "No se pudo obtener el Video URI.");
+                        Toast.makeText(MainActivity.this, "No se encontró video guardado.", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e("Error", "Hubo un error al mostrar el video: " + e.getMessage());
+                    Toast.makeText(MainActivity.this, "Error al mostrar el video", Toast.LENGTH_SHORT).show();
                 }
             }
         });

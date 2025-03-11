@@ -10,7 +10,7 @@
                 TABLE_NAME+" ("+
                 COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"+
                 COLUMN_NOMBRE+" TEXT,"+
-                COLUMN_VIDEO+" BLOB)";
+                COLUMN_VIDEO+" TEXT)";
 
         public static final String DROP_TABLE_VIDEO ="DROP TABLE IF EXISTS "+TABLE_NAME;
 

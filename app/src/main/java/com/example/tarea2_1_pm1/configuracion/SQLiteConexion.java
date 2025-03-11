@@ -9,8 +9,8 @@ import androidx.annotation.Nullable;
 
 
 public class SQLiteConexion extends SQLiteOpenHelper {
-    public static final String NameDB="videos";
-    public static final int version=2;
+    public static final String NameDB="videosDB";
+    public static final int version=3;
     public static final SQLiteDatabase.CursorFactory factory = null;
 
     public SQLiteConexion(@Nullable Context context) {

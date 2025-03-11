@@ -2,15 +2,19 @@ package com.example.tarea2_1_pm1.repository;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.tarea2_1_pm1.configuracion.SQLiteConexion;
 import com.example.tarea2_1_pm1.configuracion.VideosContract;
+import com.example.tarea2_1_pm1.functions.Conversions;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 
 public class VideoRepository {
@@ -23,22 +27,22 @@ public class VideoRepository {
 
     public void AddVideo(String nombre, Uri videoUri) {
         try {
-            byte[] videoBytes = convertirVideoABytes(videoUri);
-            if (videoBytes == null || videoBytes.length == 0) {
-                Log.d("SQLite", "El arreglo de bytes está vacío");
-                Toast.makeText(context, "Error al convertir el video a bytes", Toast.LENGTH_SHORT).show();
+            // Convertir el video en bytes y guardarlo en el almacenamiento
+            Conversions conversions = new Conversions(context);
+            String videoPath = conversions.saveVideoToFile(videoUri);
+
+            if (videoPath == null) {
+                Log.d("SQLite", "Error al guardar el video");
+                Toast.makeText(context, "Error al guardar el video", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            Log.d("SQLite", "Tamaño del video en bytes: " + videoBytes.length); // Confirmar que los bytes se leyeron correctamente
-
 
             SQLiteConexion conexion = new SQLiteConexion(context);
             SQLiteDatabase db = conexion.getWritableDatabase();
             ContentValues valores = new ContentValues();
 
             valores.put(VideosContract.COLUMN_NOMBRE, nombre);
-            valores.put(VideosContract.COLUMN_VIDEO, videoBytes);
+            valores.put(VideosContract.COLUMN_VIDEO, videoPath);  // Guardar solo la ruta del archivo
 
             long result = db.insert(VideosContract.TABLE_NAME, null, valores);
 
@@ -56,24 +60,36 @@ public class VideoRepository {
         }
     }
 
-    private byte[] convertirVideoABytes(Uri videoUri) {
+
+    public Uri getLastSavedVideoUri() {
+        Uri videoUri = null;
+        SQLiteConexion conexion = new SQLiteConexion(context);
+        SQLiteDatabase db = conexion.getReadableDatabase();
+        Cursor cursor = null;
+
         try {
-            InputStream inputStream = context.getContentResolver().openInputStream(videoUri);
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            byte[] buffer = new byte[4096];
-            int bytesRead;
+            cursor = db.query(VideosContract.TABLE_NAME,
+                    new String[]{VideosContract.COLUMN_ID, VideosContract.COLUMN_VIDEO},
+                    null, null, null, null, VideosContract.COLUMN_ID + " DESC", "1");
 
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, bytesRead);
+            if (cursor != null && cursor.moveToFirst()) {
+                // Recuperar la ruta del archivo desde la base de datos
+                String videoPath = cursor.getString(cursor.getColumnIndex(VideosContract.COLUMN_VIDEO));
+
+                if (videoPath != null && !videoPath.isEmpty()) {
+                    videoUri = Uri.fromFile(new File(videoPath));  // Crear un URI a partir de la ruta
+                }
             }
-
-            inputStream.close();
-            return byteArrayOutputStream.toByteArray();
-
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            Log.e("SQLite", "Error al obtener el video guardado: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
         }
+        return videoUri;
     }
 
 
