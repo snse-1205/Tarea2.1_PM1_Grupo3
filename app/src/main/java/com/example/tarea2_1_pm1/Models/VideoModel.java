@@ -5,22 +5,22 @@ import java.sql.Blob;
 public class VideoModel {
     private int id;
     private String nombre;
-    private Blob video;
+    private String video;
 
     public VideoModel() {
     }
 
-    public VideoModel(Blob video, String nombre, int id) {
+    public VideoModel(String video, String nombre, int id) {
         this.video = video;
         this.nombre = nombre;
         this.id = id;
     }
 
-    public Blob getVideo() {
+    public String getVideo() {
         return video;
     }
 
-    public void setVideo(Blob video) {
+    public void setVideo(String video) {
         this.video = video;
     }
 

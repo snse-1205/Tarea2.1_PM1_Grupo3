@@ -72,23 +72,8 @@ public class MainActivity extends AppCompatActivity {
         mostrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    VideoRepository videoRepository = new VideoRepository(MainActivity.this);
-                    Uri videoUri = videoRepository.getLastSavedVideoUri();
-
-                    if (videoUri != null) {
-                        Log.d("VideoUri", "Video URI obtenido: " + videoUri.toString());
-                        videoView.setVideoURI(videoUri);
-                        videoView.start();
-                    } else {
-                        Log.e("VideoUri", "No se pudo obtener el Video URI.");
-                        Toast.makeText(MainActivity.this, "No se encontró video guardado.", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e("Error", "Hubo un error al mostrar el video: " + e.getMessage());
-                    Toast.makeText(MainActivity.this, "Error al mostrar el video", Toast.LENGTH_SHORT).show();
-                }
+                Intent intent = new Intent(getApplicationContext(),RegistrosActivity.class);
+                startActivity(intent);
             }
         });
     }
