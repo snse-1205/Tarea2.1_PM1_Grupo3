@@ -36,53 +36,23 @@ public class videoListaAdapter extends RecyclerView.Adapter<videoListaAdapter.Vi
 
     @NonNull
     @Override
-    public listaContactosAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_contacto,parent,false);
+    public videoListaAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.list_item_video,parent,false);
         return new ViewHolder(view);
     }
 
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        VideoModel contacto = videos.get(position);
-        holder.txtNombre.setText(contacto.getNombre());
-        String codigo = PaisesRepository.obtenerCodigoPorId(contacto.getIdpais());
-        holder.txtTelefono.setText("("+codigo+") "+contacto.getNumero());
-        if(contacto.getImagen().equals("1")){
-            holder.imageviwe.setImageResource(R.drawable.round_account_circle_24);
-        }else{
-            holder.imageviwe.setImageBitmap(imageUtils.decodeFromBase64(contacto.getImagen()));
-        }
-
-        holder.itemView.setOnClickListener(view -> {
-            Intent intent = new Intent(context, Acciones.class);
-            intent.putExtra("contacto_id", contacto.getId());
-            context.startActivity(intent);
-        });
+        VideoModel video = videos.get(position);
+        holder.textView.setText(video.getNombre());
+        holder.videoView.setVideoURI(video.getVideo());
+        holder.videoView.start();
     }
 
     @Override
     public int getItemCount() {
         return videos.size();
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.list_item_video, parent, false);
-        }
-
-        VideoView videoView = convertView.findViewById(R.id.videoView1);
-        TextView textView = convertView.findViewById(R.id.textView2);
-
-        VideoModel video = videos.get(position);
-        VideoRepository videoRepository = new VideoRepository(context);
-        Uri videoUri = videoRepository.getLastSavedVideoUri();
-
-        videoView.setVideoURI(videoUri);
-        textView.setText("Mi Video");
-
-        return convertView;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

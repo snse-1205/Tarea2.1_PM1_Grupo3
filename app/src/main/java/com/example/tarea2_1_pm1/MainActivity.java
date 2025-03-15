@@ -14,6 +14,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.VideoView;
 import androidx.annotation.Nullable;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_PERMISSIONS = 100;
 
     private VideoView videoView;
+    private EditText nombreVideo;
     private Button guardar, grabar, mostrar;
     private static Uri videoUri;
 
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         videoView = findViewById(R.id.videoView);
+        nombreVideo = findViewById(R.id.editTextText);
         guardar = findViewById(R.id.button2);
         grabar = findViewById(R.id.button);
         mostrar = findViewById(R.id.button3);
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (videoUri != null) {
                     VideoRepository videoRepository = new VideoRepository(MainActivity.this);
-                    videoRepository.AddVideo("Mi Video", videoUri);
+                    videoRepository.AddVideo(nombreVideo.getText().toString(), videoUri);
                 }
             }
         });

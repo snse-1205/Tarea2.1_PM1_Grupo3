@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 
 public class SQLiteConexion extends SQLiteOpenHelper {
     public static final String NameDB="videosDB";
-    public static final int version=3;
+    public static final int version=7;
     public static final SQLiteDatabase.CursorFactory factory = null;
 
     public SQLiteConexion(@Nullable Context context) {
@@ -25,5 +25,6 @@ public class SQLiteConexion extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(VideosContract.DROP_TABLE_VIDEO);
+        onCreate(db);
     }
 }

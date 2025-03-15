@@ -1,27 +1,29 @@
 package com.example.tarea2_1_pm1.Models;
 
+import android.net.Uri;
+
 import java.sql.Blob;
 
 public class VideoModel {
     private int id;
     private String nombre;
-    private String video;
+    private Uri video;
 
     public VideoModel() {
     }
 
-    public VideoModel(String video, String nombre, int id) {
-        this.video = video;
-        this.nombre = nombre;
+    public VideoModel(int id, String nombre, Uri video) {
         this.id = id;
-    }
-
-    public String getVideo() {
-        return video;
-    }
-
-    public void setVideo(String video) {
+        this.nombre = nombre;
         this.video = video;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -32,11 +34,11 @@ public class VideoModel {
         this.nombre = nombre;
     }
 
-    public int getId() {
-        return id;
+    public Uri getVideo() {
+        return video;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setVideo(Uri video) {
+        this.video = video;
     }
 }

@@ -1,8 +1,10 @@
 package com.example.tarea2_1_pm1.functions;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Base64;
 
 import java.io.ByteArrayOutputStream;
@@ -45,8 +47,11 @@ public class Conversions {
 
     public String saveVideoToFile(Uri videoUri) {
         try {
-            // Crear un archivo en el almacenamiento
-            File outputFile = new File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "video.mp4");
+            // Obtener el nombre del archivo original a partir del URI
+            String fileName = getFileName(videoUri);
+
+            // Crear el archivo en el almacenamiento con el nombre original
+            File outputFile = new File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileName);
 
             // Copiar los bytes del video al archivo
             InputStream inputStream = context.getContentResolver().openInputStream(videoUri);
@@ -67,6 +72,27 @@ public class Conversions {
             return null;
         }
     }
+
+    // Método para obtener el nombre del archivo del URI
+    private String getFileName(Uri uri) {
+        String fileName = null;
+        String[] projection = {MediaStore.MediaColumns.DISPLAY_NAME};
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME);
+            fileName = cursor.getString(columnIndex);
+            cursor.close();
+        }
+
+        // Si no se encuentra el nombre, puede devolver un nombre por defecto o generar uno.
+        if (fileName == null) {
+            fileName = "video_" + System.currentTimeMillis() + ".mp4";
+        }
+
+        return fileName;
+    }
+
 
 
     public Uri saveVideoFromBase64(String videoBase64) {
